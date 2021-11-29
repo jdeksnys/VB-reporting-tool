@@ -1,0 +1,222 @@
+Option Explicit
+
+Sub SortCount()
+
+Worksheets("Data").Select
+ Dim lrow As Long
+ lrow = Cells(Rows.Count, 1).End(xlUp).Row
+ Range(Cells(2, 2), Cells(lrow, 2)).Select
+    selection.Replace What:="", Replacement:="<bankname>", LookAt:=xlPart, _
+        SearchOrder:=xlByRows, MatchCase:=False, FormulaVersion:= _
+        xlReplaceFormula2
+
+
+Worksheets("Pivot").Select
+
+Dim lr, lc As Long
+Dim fr As Integer
+lr = Cells(Rows.Count, 1).End(xlUp).Row
+lc = Cells(lr, Columns.Count).End(xlToLeft).Column
+fr = Cells(1, lc).End(xlDown).Offset(1).Row
+
+Cells(lr, lc).Select
+ActiveSheet.PivotTables("Pivot t. no.2").PivotFields("Sum of Apyvarta"). _
+    Function = xlCount
+
+'Cells(fr, lc).Select
+'ActiveSheet.PivotTables("Pivot t. no.2").PivotFields("Data").Orientation = _
+'xlHidden
+
+ActiveSheet.PivotTables("Pivot t. no.2").PivotFields("Gavejas/Moketojas") _
+.AutoSort xlDescending, "Count of Apyvarta"
+
+Range(Cells(fr, 1), Cells(fr + 4, 1)).Copy Worksheets("Summary").Range("a26")
+Range(Cells(fr, lc), Cells(fr + 4, lc)).Copy Worksheets("Summary").Range("c26")
+Worksheets("Summary").Select
+
+'Range("b26:b30").Cut Range("c26:c30")
+
+Worksheets("Summary").PageSetup.LeftMargin = _
+ Application.InchesToPoints(0.2)
+
+Call xlookup
+Call FmtTop10
+
+End Sub
+
+Sub xlookup()
+
+Worksheets("Pivot").Select
+ActiveSheet.PivotTables("Pivot t. no.2").PivotFields("Count of Apyvarta"). _
+Function = xlSum
+
+
+Dim lr, lc As Long
+Dim fr, x As Integer
+lr = Worksheets("Pivot").Cells(Rows.Count, 1).End(xlUp).Row
+lc = Worksheets("Pivot").Cells(lr, Columns.Count).End(xlToLeft).Column
+fr = Worksheets("Pivot").Cells(1, lc).End(xlDown).Offset(1).Row
+
+
+For x = 26 To 30
+'Do Until IsEmpty(Cells(x, 1))
+Err.Clear
+Dim target As Range
+Dim ieskom As String
+
+Worksheets("Pivot").Select
+Set target = Range(Cells(fr, 1), Cells(lr - 1, lc))
+Worksheets("Summary").Select
+ieskom = Range("a" & x).Value
+
+On Error Resume Next
+Cells(x, 2) = Application.WorksheetFunction.VLookup( _
+    ieskom, _
+    target, _
+    lc, _
+    False)
+    
+
+Next x
+
+'Loop
+
+'Dim x, looker As Integer
+'Dim larray As Range
+'Dim rarray As Range
+'Set larray = Range(Cells(fr, 1), Cells(lr - 1, 1))
+'Set rarray = Range(Cells(fr, lc), Cells(lr - 1, lc))
+'
+'If Err.Number <> 0 Then
+'Err.Clear
+'Cells(x, 3).Value = Application.WorksheetFunction.xlookup(Cells(x, 1).Value, larray, rarray, "Not found", 0, False)
+'End If
+'
+'Cells(x, 3).Select
+'selection.FormulaR1C1 = _
+'        "=XLOOKUP(RC[-2],Pivot!R5C1:R7C1,Pivot!R5C5:R7C5,""Nerasta"",0,1)"
+
+'antras metodas
+'xlookup( _
+'    Cells(x, 1).Value, _
+'    Sheets("Pivot").Range(Cells(fr, 1), Cells(lr - 1, 1)), _
+'    Sheets("Pivot").Range(Cells(fr, 2), Cells(lr - 1, 2)), _
+'    "Not available", _
+'    0)
+
+End Sub
+Sub FmtTop10()
+
+Dim lr As Integer
+lr = Cells(Rows.Count, 3).End(xlUp).Row
+
+    Sheets("Summary").Select
+    ActiveWindow.Zoom = 134
+    Range("A24").Select
+    ActiveCell.FormulaR1C1 = "Top5 Dazniausios islaidos"
+    Range("A25").Select
+    ActiveCell.FormulaR1C1 = "Mokejimas"
+    Range("B25").Select
+    ActiveCell.FormulaR1C1 = "Mokejimu suma"
+    Range("C25").Select
+    selection.FormulaR1C1 = "Mokejimu skaicius"
+    
+    'Columns("C:C").EntireColumn.AutoFit
+    
+    With selection
+        .HorizontalAlignment = xlGeneral
+        .VerticalAlignment = xlBottom
+        .WrapText = True
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Rows("25:25").EntireRow.AutoFit
+    Range("b26:b30").Select
+    selection.NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* ""-""??_);_(@_)"
+    
+    Range("A24:C25,A26:C" & lr).Select
+    Range("A26").Activate
+    selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    selection.Borders(xlInsideVertical).LineStyle = xlNone
+    selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent5
+        .TintAndShade = 0.799981688894314
+        .PatternTintAndShade = 0
+    End With
+    
+    Range("A24:C25").Select
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent5
+        .TintAndShade = -0.249977111117893
+        .PatternTintAndShade = 0
+    End With
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent5
+        .TintAndShade = -0.249977111117893
+        .PatternTintAndShade = 0
+    End With
+    With selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    
+        Range("A26:A30").Select
+    With selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlBottom
+        .WrapText = True
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    
+    Rows("26:30").EntireRow.AutoFit
+    
+    
+End Sub

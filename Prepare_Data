@@ -1,0 +1,168 @@
+Option Explicit
+
+
+Public Sub RetrieveData()
+
+Worksheets("Backup of Backup").Select
+ Dim lrow As Long
+ lrow = Cells(10, 3).End(xlDown).Row
+ Range(Cells(10, 3), Cells(lrow, 3)).Select
+    selection.Replace What:="", Replacement:="<bankname>", LookAt:=xlPart, _
+        SearchOrder:=xlByRows, MatchCase:=False, FormulaVersion:= _
+        xlReplaceFormula2
+
+Dim lr, lrdata As Integer
+Worksheets("Backup of Backup").Select
+lr = Range("f10").End(xlDown).Offset(-1).Row
+
+Worksheets(3).Select
+Range("a2").UnMerge
+Range("a2").ClearContents
+Range("a4").UnMerge
+Range("a4").ClearContents
+
+Worksheets.Add.Select
+ActiveSheet.name = "Data"
+Worksheets("Backup of Backup").Select
+Range("a8:f" & lr).Copy Worksheets("Data").Range("a1")
+Worksheets("Data").Select
+Rows(2).Delete
+Columns(1).Delete
+Range("b1").Value = "Gavejas/Moketojas"
+
+ Columns("D:E").Select
+     selection.NumberFormat = _
+        "_-[$€-x-euro2] * #,##0.00_ ;_-[$€-x-euro2] * -#,##0.00 ;_-[$€-x-euro2] * ""-""??_ ;_-@_ "
+  
+
+End Sub
+Sub SelectExpenses()
+
+    Worksheets("Data").Select
+    Range("A1:E687").Select
+    Range("D1").Activate
+    selection.AutoFilter
+    ActiveSheet.Range("$A$1:$E$687").AutoFilter Field:=4, Criteria1:="<0"
+
+End Sub
+
+Sub SelectProfit()
+
+    Range("D1").Select
+    selection.AutoFilter
+        ActiveSheet.Range("$A$1:$E$687").AutoFilter Field:=4, Criteria1:=">0"
+
+End Sub
+Sub SelectData()
+
+Dim Title, DefaultValue As String
+Dim YNanswer, Period As Integer
+
+Title = "Apyvartos pasirinkimas"
+DefaultValue = "1, 2, 3 arba 4"
+
+Period = Application.InputBox("Pasirinkite laikotarpi:" & vbCrLf & _
+"1 - Paskutinis menuo" & vbCrLf & _
+"2 - Paskutiniai trys men." & vbCrLf & _
+"3 - Paskutiniai metai" & vbCrLf & _
+"4 - Visi turimi duomenys", Title, DefaultValue)
+Worksheets.Add.name = "Summary"
+Worksheets("Data").Select
+
+Select Case Period
+Case 1
+    Worksheets("Summary").Range("b4").Value = "Paskutinis menuo"
+        Call Last1
+        Call Pivot
+    Sheets("Pivot").Select
+    Dim day30 As Date
+    day30 = Date - 30
+    ActiveSheet.PivotTables("Pivot t. no.2").PivotFields("Data").PivotFilters.Add2 _
+    Type:=xlAfter, Value1:=CLng(day30)
+    Call sortpivot
+        
+Case 2
+    Worksheets("Summary").Range("b4").Value = "Paskutiniai 3men."
+        Call Last3
+        Call Pivot
+            Sheets("Pivot").Select
+    Dim day90 As Date
+    day90 = Date - 90
+    ActiveSheet.PivotTables("Pivot t. no.2").PivotFields("Data").PivotFilters.Add2 _
+    Type:=xlAfter, Value1:=CLng(day90)
+    Call sortpivot
+    
+Case 3
+    Worksheets("Summary").Range("b4").Value = "Paskutiniai metai"
+        Call LastYR
+        Call Pivot
+    Sheets("Pivot").Select
+    Dim day365 As Date
+    day365 = Date - 365
+    ActiveSheet.PivotTables("Pivot t. no.2").PivotFields("Data").PivotFilters.Add _
+    Type:=xlAfter, Value1:=CLng(day365)
+    Call sortpivot
+    
+Case 4
+    Worksheets("Summary").Range("b4").Value = "Visi turimi duomenys"
+        Call SelectExpenses
+        Call Pivot
+        Call sortpivot
+        
+Case Else
+        YNanswer = MsgBox("Neteisingai ivedete pasirinkima. Ar norite bandyti dar karta?", vbYesNo)
+            If YNanswer = vbYes Then
+                Call SelectData
+            End If
+End Select
+ 
+End Sub
+
+Sub Last1()
+
+Dim day As Long
+Dim lr As Integer
+lr = Cells(Rows.Count, 1).End(xlUp).Row
+day = Date
+
+    Range("A1").Select
+    selection.AutoFilter
+    ActiveSheet.Range("$A$1:E" & lr).AutoFilter Field:=1, Criteria1:=">=" & (day - 30)
+    ActiveSheet.Range("$A$1:E" & lr).AutoFilter Field:=4, Criteria1:="<0"
+
+End Sub
+
+Sub Last3()
+
+Dim day As Long
+Dim lr As Integer
+lr = Cells(Rows.Count, 1).End(xlUp).Row
+day = Date
+
+    Range("A1").Select
+    selection.AutoFilter
+    ActiveSheet.Range("$A$1:E" & lr).AutoFilter Field:=1, Criteria1:=">=" & (day - 90)
+    ActiveSheet.Range("$A$1:E" & lr).AutoFilter Field:=4, Criteria1:="<0"
+
+End Sub
+
+Sub LastYR()
+
+Dim day As Long
+Dim lr As Integer
+lr = Cells(Rows.Count, 1).End(xlUp).Row
+day = Date
+
+    Range("A1").Select
+    selection.AutoFilter
+    ActiveSheet.Range("$A$1:E" & lr).AutoFilter Field:=1, Criteria1:=">=" & (day - 365)
+    ActiveSheet.Range("$A$1:E" & lr).AutoFilter Field:=4, Criteria1:="<0"
+    
+    
+    'Worksheets("Data").Select
+    'Range("A1:E687").Select
+    'Range("D1").Activate
+    'Selection.AutoFilter
+    'ActiveSheet.Range("$A$1:$E$687").AutoFilter field:=4, Criteria1:="<0"
+
+End Sub

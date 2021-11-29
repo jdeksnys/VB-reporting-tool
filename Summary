@@ -1,0 +1,285 @@
+Option Explicit
+
+Sub Txt()
+
+Dim lc, lr As Integer
+
+
+
+    Sheets("Backup of Backup").Select
+    Range("A1:C1").Select
+    selection.Copy
+    Sheets("Summary").Select
+    Range("A1").Select
+    selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    With selection.Font
+        .name = "Arial"
+        .Size = 14
+        .Strikethrough = False
+        .Superscript = False
+        .Subscript = False
+        .OutlineFont = False
+        .Shadow = False
+        .Underline = xlUnderlineStyleNone
+        .ColorIndex = xlAutomatic
+        .TintAndShade = 0
+        .ThemeFont = xlThemeFontNone
+    End With
+    selection.Font.Bold = True
+    Range("A2").Select
+    selection.FormulaR1C1 = "Saskaitos apibendrinimas"
+    Range("A4").Select
+    selection.FormulaR1C1 = "Pasirinktas laikotarpis:"
+
+    Range("A5").Select
+    selection.FormulaR1C1 = "Is viso islaidu per laikotarpi:"
+    
+    'ISLAIDU SUMA ISLAIDU SUMA ISLAIDU SUMA ISLAIDU SUMA ISLAIDU SUMA ISLAIDU SUMA
+      lr = Worksheets("Pivot").Cells(Rows.Count, 1).End(xlUp).Row
+    lc = Worksheets("Pivot").Cells(4, Columns.Count).End(xlToLeft).Column
+      
+      Range("B5").Select
+    selection.Value = WorksheetFunction.Sum( _
+    Range( _
+                    Worksheets("Data").Cells(1, 4).Offset(1), _
+                    Worksheets("Data").Cells(1, 4).Offset(1).Offset(1).End(xlDown)).SpecialCells(xlCellTypeVisible))
+
+    
+    Range("A7").Select
+    ActiveCell.FormulaR1C1 = "Top10 Didziausios islaidos"
+    Range("A8").Select
+    ActiveCell.FormulaR1C1 = "Mokejimas"
+    Range("B8").Select
+    selection.FormulaR1C1 = "Suma"
+    Sheets("Pivot").Select
+    
+    Dim last10 As Integer
+last10 = (Cells(Rows.Count, 1).End(xlUp).Offset(-1).Row) - 4
+If last10 > 10 Then
+    Range(Cells(5, 1), Cells(14, 1)).Select
+Else:
+     Range(Cells(5, 1), Cells(Application.Match("Grand Total", Columns(1), 0) - 1, 1)).Select
+End If
+    selection.Copy
+    Sheets("Summary").Select
+    Range("A9").Select
+    selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    
+    
+    
+    'copy expenses
+    Dim endrow As Integer
+    endrow = (Cells(Rows.Count, 1).End(xlUp).Row) - 1
+    
+    Worksheets("Pivot").Select
+    If last10 > 10 Then
+    Range(Cells(5, lc), Cells(14, lc)).Select
+Else:
+     Range(Cells(5, lc), Cells(Application.Match("Grand Total", Columns(1), 0) - 1, lc)).Select
+End If
+    selection.Copy
+    Sheets("Summary").Select
+    Range("B9").Select
+    selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        
+       
+        
+   'Columns("A:A").EntireColumn.AutoFit
+        Sheets("Summary").Select
+    Columns("A:A").Select
+    selection.ColumnWidth = 30.5
+    With selection
+        .HorizontalAlignment = xlGeneral
+        .VerticalAlignment = xlBottom
+        .WrapText = True
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    
+    
+    
+        Range("B5,B9:B20").Select
+    Range("B9").Activate
+    selection.NumberFormat = _
+        "_-[$€-x-euro2] * #,##0.00_-;-[$€-x-euro2] * #,##0.00_-;_-[$€-x-euro2] * ""-""??_-;_-@_-"
+        
+        Columns("B:B").AutoFit
+        
+            Sheets("Summary").Select
+    Range("B1").Select
+    selection.FormulaR1C1 = "Sukurta:"
+    With selection
+        .HorizontalAlignment = xlRight
+        .VerticalAlignment = xlBottom
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+        .Font.Bold = False
+        .Font.Size = 10
+    End With
+    Range("B2").Select
+    selection.FormulaR1C1 = "=TODAY()"
+        
+
+End Sub
+
+Sub Fmt()
+
+Dim lr As Integer
+lr = Cells(Rows.Count, 2).End(xlUp).Row
+
+    Range("A4:B5").Select
+    selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    selection.Borders(xlInsideVertical).LineStyle = xlNone
+    selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    
+    Range("A9:B" & lr).Select
+    selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    selection.Borders(xlInsideVertical).LineStyle = xlNone
+    selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Range("A7:B8").Select
+    selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    selection.Borders(xlInsideVertical).LineStyle = xlNone
+    selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Range("A4:A5").Select
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 49407
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    Range("B4:B5").Select
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent4
+        .TintAndShade = 0.799981688894314
+        .PatternTintAndShade = 0
+    End With
+    
+            Range("B4").Select
+    selection.Font.Italic = True
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 192
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    With selection.Font
+        .Color = -16711681
+        .TintAndShade = 0
+        End With
+        
+    Range("A7:B8").Select
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 6299648
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    With selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    Range("B9").Select
+    Range(selection, selection.End(xlDown)).Select
+    Range("A9:B" & lr).Select
+   
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent5
+        .TintAndShade = 0.799981688894314
+        .PatternTintAndShade = 0
+    End With
+End Sub

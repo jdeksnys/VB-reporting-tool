@@ -1,0 +1,128 @@
+Option Explicit
+
+Sub AvgExp()
+
+Call DataCopy
+
+    Dim pc As PivotCache
+    Dim lr As Long
+    Dim pt As PivotTable
+    Dim pf As PivotField
+    lr = Cells(Rows.Count, 1).End(xlUp).Row
+
+    
+    Set pc = ThisWorkbook.PivotCaches.Create( _
+SourceType:=xlDatabase, _
+SourceData:=Worksheets("DataCopy").name & "!" & Worksheets("DataCopy").Range("a1").CurrentRegion.Address, _
+Version:=xlPivotTableVersion15)
+
+Worksheets.Add.Select
+ActiveSheet.name = "Pivot2"
+
+    Set pt = pc.CreatePivotTable(tabledestination:=Worksheets("Pivot2").Range("A3"), _
+    TableName:="Pivot no.2")
+
+    Set pf = pt.PivotFields("Data")
+        pf.Orientation = xlRowField
+    Set pf = pt.PivotFields("Apyvarta")
+        pf.Orientation = xlDataField
+    
+    
+    
+    ActiveSheet.PivotTables("Pivot no.2").PivotFields("Data").AutoGroup
+    Range("A4").Select
+    selection.Group Start:=True, End:=True, By:=7, Periods:=Array(False, _
+        False, False, True, False, False, False)
+        
+            Sheets("Pivot2").Select
+    Range("B3").Select
+    selection.End(xlDown).Select
+    ActiveSheet.PivotTables("Pivot no.2").PivotFields("Sum of Apyvarta").Function _
+        = xlAverage
+        
+        Columns("B:B").Select
+         selection.NumberFormat = _
+        "_-[$€-x-euro2] * #,##0.00_ ;_-[$€-x-euro2] * -#,##0.00 ;_-[$€-x-euro2] * ""-""??_ ;_-@_ "
+        
+        
+        Call InsertAvg
+        
+End Sub
+Sub InsertAvg()
+
+Dim lr As Long
+lr = Worksheets("Pivot2").Cells(Rows.Count, 2).End(xlUp).Row
+
+    Sheets("Summary").Select
+    Range("A20").Value = "Vidutiniskai per savaite isleidziate:"
+    
+    Range("B20").Value = Worksheets("Pivot2").Range("b" & lr)
+        
+    Range("B20").Select
+    selection.NumberFormat = _
+        "_-[$€-x-euro2] * #,##0.00_ ;_-[$€-x-euro2] * -#,##0.00 ;_-[$€-x-euro2] * ""-""??_ ;_-@_ "
+  
+    Range("A20:B20").Select
+    selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Range("A20").Select
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 49407
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    Range("B20").Select
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent4
+        .TintAndShade = 0.599993896298105
+        .PatternTintAndShade = 0
+    End With
+    
+    Range("B20").NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* ""-""??_);_(@_)"
+ 
+    
+End Sub
+
+Sub DataCopy()
+
+Worksheets.Add.name = "DataCopy"
+
+Worksheets("Data").Select
+Cells(1, 1).Offset(1).Select
+
+Range(Range("a1:e1").Offset(1), selection.End(xlDown)).SpecialCells(xlCellTypeVisible) _
+    .Copy Worksheets("DataCopy").Cells(2, 1)
+    
+Worksheets("Data").Select
+Range("a1:e1").Copy Worksheets("DataCopy").Range("a1")
+
+End Sub

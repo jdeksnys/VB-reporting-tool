@@ -1,0 +1,158 @@
+Option Explicit
+
+
+Sub GraphWeekly()
+
+Dim lr, lastdata As Long
+Dim xrange As Range
+Dim cht As ChartObject
+
+Worksheets("Pivot2").Select
+    Range("a1").End(xlDown).Select
+    Set xrange = Range(selection.Offset(1), selection.End(xlDown).Offset(-1)).SpecialCells(xlCellTypeVisible)
+    
+    Range("b1").End(xlDown).Select
+Range(selection.Offset(1), selection.End(xlDown).Offset(-1)).SpecialCells(xlCellTypeVisible).Select
+    
+    ActiveSheet.Shapes.AddChart.Select
+    ActiveChart.ChartType = xlColumnClustered
+    
+    ActiveChart.Parent.name = "GraphWeekly"
+    Application.CutCopyMode = False
+    Application.CutCopyMode = False
+    Application.CutCopyMode = False
+    ActiveChart.Axes(xlValue).Select
+    ActiveChart.ChartArea.Select
+    ActiveChart.ApplyChartTemplate ( _
+        "/Users/jonasdeksnys/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Chart Templates.localized/Mac style chart.crtx" _
+        )
+    ActiveChart.Legend.Delete
+        ActiveChart.ChartTitle.Text = "Islaidos pagal savaites"
+        ActiveChart.Axes(xlValue).AxisTitle.Delete
+        ActiveChart.Axes(xlCategory).AxisTitle.Delete
+        
+            ActiveSheet.ChartObjects("GraphWeekly").Activate
+    ActiveChart.Axes(xlValue).Select
+    ActiveChart.Axes(xlValue).ReversePlotOrder = True
+    ActiveChart.Axes(xlCategory).Select
+    selection.TickLabelPosition = xlHigh
+    ActiveChart.ChartArea.Select
+        
+    ActiveChart.Parent.Cut
+    Sheets("Summary").Select
+    Range("e16").Select
+    ActiveSheet.Paste
+    
+    ActiveSheet.ChartObjects("GraphWeekly").Activate
+    ActiveSheet.ChartObjects("GraphWeekly").Activate
+    ActiveChart.Axes(xlValue).Select
+    selection.TickLabels.NumberFormat = _
+        "_-[$€-x-euro2] * # ##0,00_-;-[$€-x-euro2] * # ##0,00_-;_-[$€-x-euro2] * ""-""??_-;_-@_-"
+    
+End Sub
+
+
+Public Sub WeeklyChange()
+Dim lr As Long
+Dim delta, avg, week1 As Double
+Worksheets("Pivot2").Select
+
+'lr = Cells(Rows.Count, 2).End(xlUp).Row
+avg = Abs(Cells(Rows.Count, 2).End(xlUp).Value)
+week1 = Abs(Cells((Cells(Rows.Count, 2).End(xlUp).Row - 1), 2).Value)
+delta = (week1 / avg - 1)
+
+Worksheets("Summary").Range("b22").Value = delta
+    
+Worksheets("Summary").Select
+Range("b22").Select
+
+
+    selection.Style = "Per cent"
+    selection.NumberFormat = "+0%;-0%;0%"
+
+Call addblue
+Call raudonazalia
+       
+End Sub
+Sub addblue()
+'
+' addblue Macro
+'
+
+'
+    
+    Range("A22").Select
+    selection.FormulaR1C1 = "Paskutines sav. islaidu pokytis lyginant su laikotarpiu:"
+    Range("A22:B22").Select
+    selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    selection.Borders(xlInsideVertical).LineStyle = xlNone
+    selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    
+    
+     Range("A22").Select
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = -0.0499893185216834
+        .PatternTintAndShade = 0
+    End With
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = -0.149998474074526
+        .PatternTintAndShade = 0
+    End With
+    Range("B22").Select
+    With selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = -0.0499893185216834
+        .PatternTintAndShade = 0
+    End With
+    
+End Sub
+
+Sub raudonazalia()
+
+Range("b22").Select
+
+If selection.Value > 0 Then
+selection.Font.Color = -16776961
+    ElseIf selection.Value < 0 Then
+    selection.Font.Color = -11489280
+    Else
+End If
+
+End Sub
+
+
+

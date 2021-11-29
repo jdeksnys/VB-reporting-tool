@@ -1,0 +1,56 @@
+Option Explicit
+
+
+Sub Pivot()
+
+Worksheets("Data").Select
+ Dim lrow As Long
+ lrow = Cells(Rows.Count, 1).End(xlUp).Row
+ Range(Cells(2, 2), Cells(lrow, 2)).Select
+    selection.Replace What:="", Replacement:="<bankname>", LookAt:=xlPart, _
+        SearchOrder:=xlByRows, MatchCase:=False, FormulaVersion:= _
+        xlReplaceFormula2
+
+
+
+Dim pc As PivotCache
+Dim lr As Integer
+Dim pt As PivotTable
+Dim pf As PivotField
+lr = Cells(Rows.Count, 1).End(xlUp).Row
+
+
+Set pc = ThisWorkbook.PivotCaches.Create( _
+    SourceType:=xlDatabase, _
+    SourceData:=Worksheets("Data").name & "!" & Worksheets("Data").Range("A1").CurrentRegion.Address, _
+    Version:=xlPivotTableVersion15)
+    
+Worksheets.Add.Select
+ActiveSheet.name = "Pivot"
+
+
+Set pt = pc.CreatePivotTable(tabledestination:=Worksheets("Pivot").Range("a3"), _
+    TableName:="Pivot t. no.2")
+    
+    Set pf = pt.PivotFields("Gavejas/Moketojas")
+        pf.Orientation = xlRowField
+    Set pf = pt.PivotFields("Apyvarta")
+        pf.Orientation = xlDataField
+    Set pf = pt.PivotFields("Data")
+        pf.Orientation = xlColumnField
+    
+    
+Range("b4").Sort key1:=Range("B4:B" & (lr - 1)), order1:=xlAscending, Header:=xlYes
+
+
+
+    
+End Sub
+Sub SortPivotLast1()
+Dim day As Date
+day = Date
+
+    Worksheets("Pivot").PivotTables("Pivot t. no.2").PivotFields("Data").ClearAllFilters
+    ActiveSheet.PivotTables("Pivot t. no.2").PivotFields("Data").PivotFilters.Add2 _
+        Type:=xlAfter, Value1:=(day - 30)
+End Sub

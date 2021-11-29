@@ -1,0 +1,44 @@
+Option Explicit
+
+Public Sub Final()
+
+Worksheets(1).Copy after:=Worksheets(1)
+Worksheets(2).name = "Backup"
+Worksheets(1).Copy after:=Worksheets(1)
+Worksheets(3).name = "Backup of Backup"
+
+Call RetrieveData
+Call SelectData
+Call Txt
+Call Fmt
+Call AvgExp
+Call graph2
+Call GraphWeekly
+Call WeeklyChange
+Call SortCount
+Call ReadyMargins
+
+Worksheets("Summary").Move after:=Worksheets(1)
+Worksheets("Data").Move after:=Worksheets(2)
+Worksheets(Array(4, 5, 6, 7, 8)).Delete
+Worksheets("Summary").Select
+
+End Sub
+
+Public Sub Redo()
+
+
+Worksheets(Array(3, 4, 5, 6, 7, 8)).Delete
+Worksheets(2).Copy after:=Worksheets(2)
+Worksheets(3).name = "Backup of Backup"
+ Dim lr As Long
+ lr = Cells(10, 3).End(xlDown).Row
+ 
+ Range(Cells(10, 3), Cells(lr, 3)).Select
+    selection.Replace What:="", Replacement:="<bankname>", LookAt:=xlPart, _
+        SearchOrder:=xlByRows, MatchCase:=False, FormulaVersion:= _
+        xlReplaceFormula2
+ 
+
+End Sub
+

@@ -1,0 +1,68 @@
+
+Sub sortpivot()
+Dim lc, lr As Integer
+lc = Cells(4, Columns.Count).End(xlToLeft).Column
+lr = Cells(Rows.Count, 1).End(xlUp).Offset(-1).Row
+
+Range(Cells(5, 1), Cells(lr, lc)).Sort key1:=Range("A4").End(xlToRight).Offset(1, 0), order1:=xlAscending, Header:=xlYes
+
+
+End Sub
+
+
+Sub graph2()
+
+Dim lr, lastdata As Long
+Dim xrange As Range
+Dim cht As ChartObject
+
+lr = Cells(Rows.Count, 5).End(xlUp).Row
+
+    Sheets("Data").Select
+    ActiveSheet.Range("a1:e" & lr).AutoFilter Field:=4
+    Cells(1, 1).Offset(1).Select
+    Set xrange = Range(Range("a1").Offset(1), selection.End(xlDown)).SpecialCells(xlCellTypeVisible)
+    
+    Cells(1, 5).Offset(1).Select
+    Range(Range("E1").Offset(1), selection.End(xlDown)).SpecialCells(xlCellTypeVisible).Copy Range("g1")
+    
+    
+    ActiveSheet.Range("a1:e" & lr).AutoFilter Field:=1
+    Range("g1").Select
+    Range(Range("g1"), selection.End(xlDown)).Select
+    
+    
+    
+    'Set cht =
+    ActiveSheet.Shapes.AddChart.Select
+    ActiveChart.ChartType = xlLine
+    
+    
+    ActiveChart.Parent.name = "Likutis"
+    ActiveChart.SeriesCollection(1).XValues = xrange
+
+    
+    
+    Application.CutCopyMode = False
+    Application.CutCopyMode = False
+    Application.CutCopyMode = False
+    ActiveChart.Axes(xlValue).Select
+    ActiveChart.ChartArea.Select
+    ActiveChart.ApplyChartTemplate ( _
+        "/Users/jonasdeksnys/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Chart Templates.localized/Simple graph.crtx" _
+        )
+    ActiveChart.Legend.Delete
+        ActiveChart.ChartTitle.Text = "Saskaitos likucio istorija"
+        ActiveChart.Axes(xlValue).AxisTitle.Delete
+        ActiveChart.Axes(xlCategory).AxisTitle.Delete
+        
+    ActiveChart.Parent.Cut
+    Sheets("Summary").Select
+    Range("e1").Select
+    ActiveSheet.Paste
+    
+        Sheets("Summary").Select
+    Columns("D:D").Select
+    selection.ColumnWidth = 2#
+    
+End Sub
